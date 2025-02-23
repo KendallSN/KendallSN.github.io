@@ -1,0 +1,109 @@
+body {
+    background-color: #2e003e;
+    color: #00d8d6;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    text-align: center;
+    padding: 200px 0;
+    font-size: large;
+    background-color: #2e003e;
+}
+
+header h1 {
+    font-size: 3em;
+    margin: 0;
+    color: #00d8d6;
+}
+
+header h2 {
+    font-size: 1.5em;
+    margin: 0;
+    color: #b300b3;
+}
+
+section {
+    padding-left: 20px;
+    padding-right: 20px;
+    margin: 20px 0;
+}
+
+.container {
+    background-color: #4b004b;
+    border-radius: 8px;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 1px;
+    padding-bottom: 5px;
+    color: #ffffff;
+}
+
+h3,h4,h5,h6 {
+    font-size: 2em;
+    color: #00d8d6;
+}
+h6 {
+    justify-items: center;
+}
+
+.project,.skill,.experience,.contact {
+    background-color: #ffffff;
+    color: #000000;
+    padding: 20px;
+    margin: 10px 0;
+    border-radius: 8px;
+}
+
+.projects-container{
+    display: flex;
+    gap: 50px;
+}
+
+.skills-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 5%;
+}
+
+.skills-container div {
+    flex: 1 0 100%;
+    max-width: 25%;
+    text-align: center;
+}
+
+.experience-title-icon {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    justify-content: left;
+    gap: 10px;
+}
+
+.star-icon {
+    height: 30px;
+}
+
+.experience p {
+    padding-left: 40px;
+}
+
+.contacts-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12%;
+}
+
+.contact {
+    width: 16%;
+    aspect-ratio: 1.1;
+}
+
+.contact-icon {
+    width: 20%;
+}
+
