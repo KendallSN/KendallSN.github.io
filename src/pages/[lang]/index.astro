@@ -1,0 +1,199 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CvDownload from '../../components/CvDownload.astro';
+import HeroSchematic from '../../components/HeroSchematic.astro';
+import SocialLinks from '../../components/SocialLinks.astro';
+import { content } from '../../data/content';
+import { images } from '../../data/site';
+import { defaultLang, type Lang } from '../../i18n/ui';
+import { isLang, languagePaths, localizePath, useTranslations } from '../../i18n/utils';
+import { toUrl } from '../../lib/url';
+
+export function getStaticPaths() {
+  return languagePaths();
+}
+
+const raw = Astro.params.lang;
+const lang: Lang = isLang(raw) ? raw : defaultLang;
+const t = useTranslations(lang);
+const about = content[lang].about;
+const avatar = toUrl(images.avatar.replace(/^\/+/, ''));
+const heroImage = toUrl(images.backgrounds.about.replace(/^\/+/, ''));
+
+/**
+ * Split a display value such as `99.9%` into an animatable number plus its
+ * suffix. The final string always stays in the HTML for no-JS and reduced
+ * motion; the counter only rewrites it while animating.
+ */
+const stats = about.stats.map((stat) => {
+  const match = /^(\d+(?:[.,]\d+)?)(.*)$/.exec(stat.value);
+  const digits = match?.[1] ?? '';
+  const numeric = digits ? Number(digits.replace(',', '.')) : Number.NaN;
+  return {
+    ...stat,
+    animatable: Number.isFinite(numeric),
+    count: Number.isFinite(numeric) ? numeric : 0,
+    decimals: /[.,]/.test(digits) ? 1 : 0,
+    suffix: match?.[2] ?? '',
+  };
+});
+---
+
+<BaseLayout lang={lang} title={t('nav.about')} description={about.hero.lead} section="about">
+  <section
+    class="page-hero about-hero"
+    style={`--hero-image: url('${heroImage}')`}
+    aria-labelledby="about-title"
+  >
+    <div class="page-hero__bg" aria-hidden="true"></div>
+    <div class="page-hero__overlay" aria-hidden="true"></div>
+    <HeroSchematic />
+
+    <div class="container about-grid">
+      <div class="about-copy stack-lg">
+        <div class="stack">
+          <span class="eyebrow">{about.hero.eyebrow}</span>
+          <h1 id="about-title" data-reveal>{about.hero.title}</h1>
+          <p class="about-role">{about.hero.roleLine}</p>
+          <p class="lead" data-reveal>{about.hero.lead}</p>
+        </div>
+
+        <div class="cta-row">
+          <a class="btn btn--primary" href={localizePath(lang, '/contact/')}>
+            <i class="bi bi-chat-square-text" aria-hidden="true"></i>
+            <span>{t('about.ctaContact')}</span>
+          </a>
+          <CvDownload lang={lang} variant="full" />
+        </div>
+
+        <div class="hero-social">
+          <span class="micro-label">{about.socialTitle}</span>
+          <SocialLinks lang={lang} />
+        </div>
+      </div>
+
+      <div class="about-portrait">
+        <div class="portrait-frame">
+          <img
+            class="portrait-img"
+            src={avatar}
+            alt={t('about.portraitAlt')}
+            width="800"
+            height="800"
+            loading="eager"
+            decoding="async"
+          />
+        </div>
+        <p class="portrait-caption">
+          <span>{t('about.portraitLabel')}</span>
+          <span>{about.portraitCaption}</span>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="bento">
+        <article class="card tick-card bento-card bento-intro" data-reveal>
+          <div class="bento-intro-head">
+            <span class="micro-label">{t('about.profileLabel')}</span>
+            <span class="bento-mark" aria-hidden="true">
+              <i class="bi bi-terminal"></i>
+            </span>
+          </div>
+          <div class="stack">
+            {about.hero.paragraphs.map((paragraph) => <p class="muted">{paragraph}</p>)}
+          </div>
+        </article>
+
+        <ul class="bento-stats" aria-label={t('about.statsLabel')}>
+          {
+            stats.map((stat) => (
+              <li class="stat">
+                <span class="stat-value">
+                  <span
+                    aria-hidden="true"
+                    data-count={stat.animatable ? String(stat.count) : undefined}
+                    data-decimals={stat.animatable ? String(stat.decimals) : undefined}
+                    data-suffix={stat.animatable ? stat.suffix : undefined}
+                  >
+                    {stat.value}
+                  </span>
+                  <span class="sr-only">{stat.value}</span>
+                </span>
+                <span class="stat-label">{stat.label}</span>
+              </li>
+            ))
+          }
+        </ul>
+
+        <div class="bento-highlights">
+          <div class="bento-head">
+            <div class="stack">
+              <span class="eyebrow">{t('about.highlightsEyebrow')}</span>
+              <h2>{t('about.highlightsTitle')}</h2>
+            </div>
+          </div>
+
+          <ul class="highlight-grid">
+            {
+              about.highlights.map((highlight) => (
+                <li class="card tick-card card-hover highlight-card" data-reveal data-spotlight>
+                  <span class="icon-badge">
+                    <i class:list={['bi', highlight.icon]} aria-hidden="true" />
+                  </span>
+                  <h3>{highlight.title}</h3>
+                  <p>{highlight.description}</p>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  const values = Array.from(document.querySelectorAll<HTMLElement>('[data-count]'));
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (values.length > 0 && !reduced && 'IntersectionObserver' in window) {
+    const format = (value: number, decimals: number) =>
+      decimals > 0 ? value.toFixed(decimals) : String(Math.round(value));
+
+    const animate = (element: HTMLElement) => {
+      const target = Number(element.dataset.count ?? '0');
+      const decimals = Number(element.dataset.decimals ?? '0');
+      const suffix = element.dataset.suffix ?? '';
+      const duration = 950;
+      const start = window.performance.now();
+
+      if (!Number.isFinite(target) || target <= 0) return;
+
+      const step = (now: number) => {
+        const progress = Math.min(1, (now - start) / duration);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        element.textContent = `${format(target * eased, decimals)}${suffix}`;
+        if (progress < 1) window.requestAnimationFrame(step);
+        else element.textContent = `${format(target, decimals)}${suffix}`;
+      };
+
+      window.requestAnimationFrame(step);
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          observer.unobserve(entry.target);
+          animate(entry.target as HTMLElement);
+        });
+      },
+      { threshold: 0.4 },
+    );
+
+    values.forEach((value) => observer.observe(value));
+  }
+</script>

@@ -1,0 +1,219 @@
+---
+import { navigation } from '../data/navigation';
+import { site } from '../data/site';
+import type { Lang } from '../i18n/ui';
+import { localizePath, useTranslations } from '../i18n/utils';
+import { toUrl } from '../lib/url';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const cvHref = toUrl(site.cv[lang].replace(/^\/+/, ''));
+
+const entries = navigation.map((item, index) => ({
+  key: item.key,
+  href: localizePath(lang, item.path),
+  label: t(item.labelKey),
+  icon: item.icon,
+  index: String(index + 1).padStart(2, '0'),
+}));
+---
+
+<button
+  class="cmdk-trigger"
+  type="button"
+  aria-haspopup="dialog"
+  aria-expanded="false"
+  aria-controls="cmdk-dialog"
+  aria-label={t('palette.open')}
+  title={t('palette.open')}
+  data-cmdk-open
+>
+  <i class="bi bi-search" aria-hidden="true"></i>
+  <span class="cmdk-keys" aria-hidden="true">
+    <kbd class="cmdk-key" data-cmdk-mod>Ctrl</kbd><kbd class="cmdk-key">K</kbd>
+  </span>
+</button>
+
+<dialog
+  class="cmdk"
+  id="cmdk-dialog"
+  aria-labelledby="cmdk-title"
+  data-cmdk-dialog
+  data-results-template={t('palette.results')}
+>
+  <div class="cmdk-panel">
+    <h2 class="cmdk-title" id="cmdk-title">{t('palette.title')}</h2>
+
+    <div class="cmdk-search">
+      <i class="bi bi-search cmdk-search-icon" aria-hidden="true"></i>
+      <input
+        class="cmdk-input"
+        id="cmdk-input"
+        type="text"
+        role="searchbox"
+        autocomplete="off"
+        spellcheck="false"
+        placeholder={t('palette.placeholder')}
+        aria-label={t('palette.placeholder')}
+        aria-controls="cmdk-list"
+        data-cmdk-input
+      />
+      <button class="cmdk-close" type="button" aria-label={t('palette.close')} data-cmdk-close>
+        <i class="bi bi-x-lg" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <ul class="cmdk-list" id="cmdk-list" aria-label={t('palette.listLabel')}>
+      {
+        entries.map((entry) => (
+          <li>
+            <a class="cmdk-link" href={entry.href} data-cmdk-item>
+              <span class="cmdk-index" aria-hidden="true">
+                {entry.index}
+              </span>
+              <i class:list={['bi', entry.icon]} aria-hidden="true" />
+              <span class="cmdk-label">{entry.label}</span>
+              <i class="bi bi-arrow-return-left cmdk-enter" aria-hidden="true" />
+            </a>
+          </li>
+        ))
+      }
+      <li>
+        <a class="cmdk-link" href={cvHref} download data-cmdk-item>
+          <span class="cmdk-index" aria-hidden="true">CV</span>
+          <i class="bi bi-filetype-pdf" aria-hidden="true" />
+          <span class="cmdk-label">{t('common.downloadCv')}</span>
+          <i class="bi bi-download cmdk-enter" aria-hidden="true" />
+        </a>
+      </li>
+    </ul>
+
+    <p class="cmdk-empty" data-cmdk-empty hidden>{t('palette.empty')}</p>
+    <p class="cmdk-hint">{t('palette.hint')}</p>
+    <p class="sr-only" role="status" aria-live="polite" data-cmdk-status></p>
+  </div>
+</dialog>
+
+<script>
+  const dialog = document.querySelector<HTMLDialogElement>('[data-cmdk-dialog]');
+  const triggers = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-cmdk-open]'));
+
+  if (dialog && triggers.length > 0) {
+    const input = dialog.querySelector<HTMLInputElement>('[data-cmdk-input]');
+    const empty = dialog.querySelector<HTMLElement>('[data-cmdk-empty]');
+    const status = dialog.querySelector<HTMLElement>('[data-cmdk-status]');
+    const items = Array.from(dialog.querySelectorAll<HTMLAnchorElement>('[data-cmdk-item]'));
+    const rows = items.map((item) => item.closest<HTMLLIElement>('li'));
+    const template = dialog.dataset.resultsTemplate ?? '{count}';
+    const modKey = dialog.querySelector<HTMLElement>('[data-cmdk-mod]');
+
+    if (modKey && /mac|iphone|ipad|ipod/i.test(navigator.userAgent)) modKey.textContent = 'Cmd';
+
+    let lastFocused: HTMLElement | null = null;
+
+    const visibleItems = () => items.filter((_item, index) => rows[index]?.hidden !== true);
+
+    const sync = () => {
+      const query = (input?.value ?? '').trim().toLowerCase();
+      let count = 0;
+
+      items.forEach((item, index) => {
+        const row = rows[index];
+        if (!row) return;
+        const haystack = (item.textContent ?? '').toLowerCase();
+        const match = query === '' || haystack.includes(query);
+        row.hidden = !match;
+        if (match) count += 1;
+      });
+
+      if (empty) empty.hidden = count > 0;
+      if (status) {
+        status.textContent = count === 0 ? '' : template.replace('{count}', String(count));
+      }
+    };
+
+    const move = (direction: 1 | -1) => {
+      const list = visibleItems();
+      if (list.length === 0) return;
+      const current = document.activeElement;
+      const index = list.findIndex((item) => item === current);
+      const next =
+        index < 0
+          ? direction === 1
+            ? list[0]
+            : list[list.length - 1]
+          : list[(index + direction + list.length) % list.length];
+      next?.focus();
+    };
+
+    const open = (opener?: HTMLElement | null) => {
+      if (dialog.open) return;
+      const active = document.activeElement;
+      lastFocused =
+        opener ?? (active instanceof HTMLElement && active !== document.body ? active : triggers[0]);
+      if (input) input.value = '';
+      sync();
+      dialog.showModal();
+      triggers.forEach((item) => item.setAttribute('aria-expanded', 'true'));
+      document.documentElement.classList.add('cmdk-open');
+      input?.focus();
+    };
+
+    const close = () => {
+      if (dialog.open) dialog.close();
+    };
+
+    triggers.forEach((item) => {
+      item.addEventListener('click', () => open(item));
+    });
+
+    dialog.querySelectorAll<HTMLElement>('[data-cmdk-close]').forEach((button) => {
+      button.addEventListener('click', close);
+    });
+
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) close();
+    });
+
+    dialog.addEventListener('close', () => {
+      triggers.forEach((item) => item.setAttribute('aria-expanded', 'false'));
+      document.documentElement.classList.remove('cmdk-open');
+      lastFocused?.focus({ preventScroll: true });
+    });
+
+    input?.addEventListener('input', sync);
+
+    dialog.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        move(1);
+        return;
+      }
+      if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        move(-1);
+        return;
+      }
+      if (event.key === 'Enter' && event.target === input) {
+        const list = visibleItems();
+        if (list.length > 0) {
+          event.preventDefault();
+          list[0].click();
+        }
+      }
+    });
+
+    document.addEventListener('keydown', (event) => {
+      const isModifier = event.ctrlKey || event.metaKey;
+      if (isModifier && !event.altKey && (event.key === 'k' || event.key === 'K')) {
+        event.preventDefault();
+        if (dialog.open) close();
+        else open();
+      }
+    });
+  }
+</script>

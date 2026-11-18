@@ -1,0 +1,103 @@
+---
+/**
+ * Decorative blueprint schematic used behind the About hero.
+ * Purely ornamental: hidden from assistive technology, no text, no state.
+ */
+---
+
+<div class="hero-schematic" aria-hidden="true" data-hero-schematic>
+  <svg viewBox="0 0 640 640" fill="none" focusable="false" role="presentation">
+    <g class="hs-rings">
+      <circle class="hs-ring" cx="320" cy="320" r="268" />
+      <circle class="hs-ring hs-ring--dashed" cx="320" cy="320" r="214" />
+      <circle class="hs-ring hs-ring--faint" cx="320" cy="320" r="146" />
+      <path class="hs-tick" d="M320 40v22M320 578v22M40 320h22M578 320h22" />
+    </g>
+
+    <g class="hs-traces">
+      <path class="hs-line" d="M64 452h118v-96h96" />
+      <path class="hs-line" d="M278 356h132v-92h96" />
+      <path class="hs-line" d="M96 208h118v64h96" />
+      <path class="hs-line" d="M310 272V136h132" />
+      <path class="hs-line" d="M278 452v92h-96" />
+      <path class="hs-line hs-line--accent" d="M442 264v168h-96" />
+      <path class="hs-line hs-line--accent" d="M214 208v-72h84" />
+    </g>
+
+    <g class="hs-flows">
+      <path class="hs-flow" d="M64 452h118v-96h96" />
+      <path class="hs-flow hs-flow--delayed" d="M278 356h132v-92h96" />
+      <path class="hs-flow hs-flow--delayed" d="M96 208h118v64h96" />
+    </g>
+
+    <g class="hs-nodes">
+      <circle class="hs-node" cx="182" cy="452" r="5" />
+      <circle class="hs-node" cx="182" cy="356" r="5" />
+      <circle class="hs-node" cx="278" cy="356" r="7" />
+      <circle class="hs-node" cx="410" cy="356" r="5" />
+      <circle class="hs-node" cx="410" cy="264" r="5" />
+      <circle class="hs-node" cx="506" cy="264" r="6" />
+      <circle class="hs-node" cx="214" cy="208" r="5" />
+      <circle class="hs-node" cx="214" cy="272" r="5" />
+      <circle class="hs-node" cx="310" cy="272" r="6" />
+      <circle class="hs-node" cx="310" cy="136" r="5" />
+      <circle class="hs-node" cx="442" cy="136" r="5" />
+      <circle class="hs-node" cx="278" cy="544" r="6" />
+      <circle class="hs-node" cx="182" cy="544" r="4" />
+      <circle class="hs-node hs-node--accent" cx="442" cy="432" r="6" />
+      <circle class="hs-node hs-node--accent" cx="298" cy="136" r="4" />
+    </g>
+
+    <g class="hs-blocks">
+      <rect class="hs-block" x="278" y="356" width="44" height="44" rx="6" />
+      <rect class="hs-block" x="290" y="254" width="20" height="20" rx="3" />
+      <rect class="hs-block hs-block--accent" x="398" y="246" width="18" height="18" rx="3" />
+    </g>
+  </svg>
+</div>
+
+<script>
+  const hero = document.querySelector<HTMLElement>('.about-hero');
+  const schematic = document.querySelector<HTMLElement>('[data-hero-schematic]');
+
+  if (hero && schematic) {
+    const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    if (finePointer.matches && !reducedMotion.matches) {
+      let frame = 0;
+      let pointerX = 0;
+      let pointerY = 0;
+
+      const paint = () => {
+        frame = 0;
+        const rect = hero.getBoundingClientRect();
+        const x = ((pointerX - rect.left) / rect.width) * 100;
+        const y = ((pointerY - rect.top) / rect.height) * 100;
+        hero.style.setProperty('--sx', `${Math.max(-10, Math.min(110, x)).toFixed(2)}%`);
+        hero.style.setProperty('--sy', `${Math.max(-10, Math.min(110, y)).toFixed(2)}%`);
+      };
+
+      hero.classList.add('is-pointer');
+
+      hero.addEventListener(
+        'pointermove',
+        (event) => {
+          pointerX = event.clientX;
+          pointerY = event.clientY;
+          if (!frame) frame = window.requestAnimationFrame(paint);
+        },
+        { passive: true },
+      );
+
+      hero.addEventListener(
+        'pointerleave',
+        () => {
+          hero.style.removeProperty('--sx');
+          hero.style.removeProperty('--sy');
+        },
+        { passive: true },
+      );
+    }
+  }
+</script>

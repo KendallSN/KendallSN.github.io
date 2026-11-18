@@ -1,0 +1,34 @@
+---
+import { images } from '../data/site';
+import type { SectionKey } from '../data/site';
+import type { Lang } from '../i18n/ui';
+import { useTranslations } from '../i18n/utils';
+import { toUrl } from '../lib/url';
+
+interface Props {
+  lang: Lang;
+  section: SectionKey;
+  index: string;
+  eyebrow: string;
+  title: string;
+  description: string;
+}
+
+const { lang, section, index, eyebrow, title, description } = Astro.props;
+const t = useTranslations(lang);
+const background = toUrl(images.backgrounds[section].replace(/^\/+/, ''));
+---
+
+<section class="page-hero" style={`--hero-image: url('${background}')`} aria-labelledby="page-title">
+  <div class="page-hero__bg" aria-hidden="true"></div>
+  <div class="page-hero__overlay" aria-hidden="true"></div>
+  <span class="page-hero__ghost" aria-hidden="true">{index}</span>
+  <div class="container page-hero__inner">
+    <span class="page-hero__index">
+      <strong>{t('common.sectionPrefix')} {index}</strong>
+      <span>{eyebrow}</span>
+    </span>
+    <h1 id="page-title" data-reveal>{title}</h1>
+    <p data-reveal>{description}</p>
+  </div>
+</section>

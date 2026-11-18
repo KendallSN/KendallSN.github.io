@@ -1,0 +1,184 @@
+---
+import CommandPalette from './CommandPalette.astro';
+import CvDownload from './CvDownload.astro';
+import LanguageSwitcher from './LanguageSwitcher.astro';
+import SocialLinks from './SocialLinks.astro';
+import { navigation } from '../data/navigation';
+import type { NavKey } from '../data/navigation';
+import { site } from '../data/site';
+import type { Lang } from '../i18n/ui';
+import { localizePath, useTranslations } from '../i18n/utils';
+
+interface Props {
+  lang: Lang;
+  section?: NavKey | null;
+}
+
+const { lang, section = null } = Astro.props;
+const t = useTranslations(lang);
+const home = localizePath(lang, '/');
+---
+
+<header class="site-header" data-header>
+  <div class="container header-inner">
+    <a class="brand" href={home} aria-label={`${site.profile.name} - ${t('common.home')}`}>
+      <span class="brand-chip">
+        <i class="bi bi-cpu" aria-hidden="true"></i>
+      </span>
+      <span class="brand-text">
+        <span class="brand-name">{site.profile.name}</span>
+        <span class="brand-role">{site.profile.role[lang]}</span>
+      </span>
+    </a>
+
+    <nav class="desktop-nav" aria-label={t('nav.primary')}>
+      <ul class="nav-list">
+        {
+          navigation.map((item) => (
+            <li>
+              <a
+                class="nav-link"
+                href={localizePath(lang, item.path)}
+                aria-current={item.key === section ? 'page' : undefined}
+              >
+                {t(item.labelKey)}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <CommandPalette lang={lang} />
+      <LanguageSwitcher lang={lang} />
+      <CvDownload lang={lang} variant="header" />
+      <div class="header-social">
+        <SocialLinks lang={lang} />
+      </div>
+      <button
+        class="nav-toggle"
+        type="button"
+        aria-expanded="false"
+        aria-controls="mobile-nav"
+        aria-label={t('common.openMenu')}
+        data-nav-toggle
+        data-label-open={t('common.openMenu')}
+        data-label-close={t('common.closeMenu')}
+      >
+        <i class="bi bi-list" aria-hidden="true" data-nav-icon></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="mobile-sheet" id="mobile-nav" data-mobile-nav>
+    <div class="container mobile-sheet-inner">
+      <button
+        class="mobile-cmdk"
+        type="button"
+        aria-haspopup="dialog"
+        aria-controls="cmdk-dialog"
+        aria-expanded="false"
+        data-cmdk-open
+      >
+        <i class="bi bi-search" aria-hidden="true"></i>
+        <span>{t('palette.trigger')}</span>
+      </button>
+
+      <nav aria-label={t('nav.mobile')}>
+        <ul class="mobile-nav-list">
+          {
+            navigation.map((item, index) => (
+              <li>
+                <a
+                  class="mobile-nav-link"
+                  href={localizePath(lang, item.path)}
+                  aria-current={item.key === section ? 'page' : undefined}
+                >
+                  <span class="mobile-nav-index" aria-hidden="true">
+                    {String(index + 1).padStart(2, '0')}
+                  </span>
+                  <i class:list={['bi', item.icon]} aria-hidden="true"></i>
+                  <span>{t(item.labelKey)}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+      <div class="mobile-extra">
+        <CvDownload lang={lang} variant="full" />
+        <a class="btn btn--ghost btn--sm" href={localizePath(lang, '/contact/')}>
+          <i class="bi bi-envelope-at" aria-hidden="true"></i>
+          <span>{t('nav.contact')}</span>
+        </a>
+      </div>
+      <div class="mobile-social">
+        <span class="micro-label">{t('common.socialLabel')}</span>
+        <SocialLinks lang={lang} />
+      </div>
+    </div>
+  </div>
+</header>
+
+<script>
+  const header = document.querySelector<HTMLElement>('[data-header]');
+
+  if (header) {
+    const toggle = header.querySelector<HTMLButtonElement>('[data-nav-toggle]');
+    const sheet = header.querySelector<HTMLElement>('[data-mobile-nav]');
+    const icon = header.querySelector<HTMLElement>('[data-nav-icon]');
+    const mobileQuery = window.matchMedia('(max-width: 1119px)');
+
+    const setOpen = (open: boolean) => {
+      if (!toggle || !sheet) return;
+      sheet.classList.toggle('is-open', open);
+      toggle.setAttribute('aria-expanded', String(open));
+      const label = open ? toggle.dataset.labelClose : toggle.dataset.labelOpen;
+      if (label) toggle.setAttribute('aria-label', label);
+      if (icon) icon.className = open ? 'bi bi-x-lg' : 'bi bi-list';
+    };
+
+    toggle?.addEventListener('click', () => {
+      const open = toggle.getAttribute('aria-expanded') !== 'true';
+      setOpen(open);
+      if (open) {
+        sheet?.querySelector<HTMLAnchorElement>('a')?.focus({ preventScroll: true });
+      }
+    });
+
+    sheet?.addEventListener('click', (event) => {
+      const target = event.target as HTMLElement | null;
+      if (target?.closest('a')) setOpen(false);
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape') return;
+      if (toggle?.getAttribute('aria-expanded') !== 'true') return;
+      setOpen(false);
+      toggle.focus();
+    });
+
+    const syncViewport = () => {
+      if (!mobileQuery.matches) setOpen(false);
+    };
+
+    mobileQuery.addEventListener('change', syncViewport);
+
+    let frame = 0;
+    const syncScroll = () => {
+      frame = 0;
+      header.classList.toggle('is-scrolled', window.scrollY > 8);
+    };
+
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (!frame) frame = window.requestAnimationFrame(syncScroll);
+      },
+      { passive: true },
+    );
+
+    syncScroll();
+  }
+</script>

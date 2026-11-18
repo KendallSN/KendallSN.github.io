@@ -1,0 +1,69 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import { content } from '../../data/content';
+import { defaultLang, type Lang } from '../../i18n/ui';
+import { isLang, languagePaths, useTranslations } from '../../i18n/utils';
+
+export function getStaticPaths() {
+  return languagePaths();
+}
+
+const raw = Astro.params.lang;
+const lang: Lang = isLang(raw) ? raw : defaultLang;
+const t = useTranslations(lang);
+const page = content[lang].education;
+---
+
+<BaseLayout
+  lang={lang}
+  title={page.intro.title}
+  description={page.intro.description}
+  section="education"
+>
+  <PageHero
+    lang={lang}
+    section="education"
+    index="02"
+    eyebrow={page.intro.eyebrow}
+    title={page.intro.title}
+    description={page.intro.description}
+  />
+
+  <section class="section">
+    <div class="container">
+      <ol class="timeline" aria-label={t('education.timelineLabel')}>
+        {
+          page.items.map((item, index) => (
+            <li class="timeline-item" data-reveal>
+              <span class="timeline-node" aria-hidden="true">
+                {String(index + 1).padStart(2, '0')}
+              </span>
+              <article class="card tick-card timeline-body">
+                <div class="timeline-head">
+                  <span class="timeline-period">{item.period}</span>
+                </div>
+                <h2 class="timeline-title">{item.title}</h2>
+                <p class="timeline-org">{item.org}</p>
+                <p class="timeline-location">{item.location}</p>
+                <p class="timeline-summary">{item.summary}</p>
+                {item.bullets.length > 0 && (
+                  <ul class="timeline-bullets">
+                    {item.bullets.map((bullet) => (
+                      <li>{bullet}</li>
+                    ))}
+                  </ul>
+                )}
+                <div class="chips timeline-tags" role="group" aria-label={t('timeline.tagsLabel')}>
+                  {item.tags.map((tag) => (
+                    <span class="chip">{tag}</span>
+                  ))}
+                </div>
+              </article>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+</BaseLayout>

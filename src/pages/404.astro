@@ -1,0 +1,47 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { site } from '../data/site';
+import { localizePath, useTranslations } from '../i18n/utils';
+import { toUrl } from '../lib/url';
+
+const tEs = useTranslations('es');
+const tEn = useTranslations('en');
+---
+
+<BaseLayout lang="es" title={tEs('notFound.title')} description={tEs('notFound.description')} noindex>
+  <section class="container notfound">
+    <div class="stack-lg">
+      <span class="eyebrow">{tEs('notFound.eyebrow')}</span>
+      <p class="notfound-code" aria-hidden="true">404</p>
+
+      <div class="stack">
+        <h1>{tEs('notFound.title')}</h1>
+        <p>{tEs('notFound.description')}</p>
+      </div>
+
+      <div class="notfound-actions">
+        <a class="btn btn--primary" href={localizePath('es', '/')}>
+          <i class="bi bi-arrow-left" aria-hidden="true"></i>
+          <span>{tEs('notFound.cta')}</span>
+        </a>
+        <a class="btn btn--ghost" href={localizePath('en', '/')} hreflang="en" lang="en">
+          <i class="bi bi-translate" aria-hidden="true"></i>
+          <span>{tEn('notFound.langSwitch')}</span>
+        </a>
+      </div>
+
+      <div class="card tick-card stack" lang="en">
+        <span class="eyebrow">{tEn('notFound.eyebrow')}</span>
+        <h2>{tEn('notFound.title')}</h2>
+        <p class="muted">{tEn('notFound.description')}</p>
+        <p><a href={localizePath('en', '/')}>{tEn('notFound.cta')}</a></p>
+      </div>
+
+      <p class="micro-label">
+        <a href={`mailto:${site.profile.email}`}>{site.profile.email}</a>
+        <span aria-hidden="true"> · </span>
+        <a href={toUrl('')}>{site.profile.name}</a>
+      </p>
+    </div>
+  </section>
+</BaseLayout>

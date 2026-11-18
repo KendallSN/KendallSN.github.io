@@ -1,0 +1,101 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import { content } from '../../data/content';
+import { images } from '../../data/site';
+import { defaultLang, type Lang } from '../../i18n/ui';
+import { isLang, languagePaths, useTranslations } from '../../i18n/utils';
+import { toUrl } from '../../lib/url';
+
+export function getStaticPaths() {
+  return languagePaths();
+}
+
+const raw = Astro.params.lang;
+const lang: Lang = isLang(raw) ? raw : defaultLang;
+const t = useTranslations(lang);
+const page = content[lang].projects;
+const isExternal = (url: string) => /^https?:/i.test(url);
+---
+
+<BaseLayout
+  lang={lang}
+  title={page.intro.title}
+  description={page.intro.description}
+  section="projects"
+>
+  <PageHero
+    lang={lang}
+    section="projects"
+    index="05"
+    eyebrow={page.intro.eyebrow}
+    title={page.intro.title}
+    description={page.intro.description}
+  />
+
+  <section class="section">
+    <div class="container">
+      <ul class="projects-grid" aria-label={t('projects.gridLabel')}>
+        {
+          page.items.map((project) => (
+            <li class="card tick-card card-hover project-card" data-reveal data-spotlight>
+              <div class="project-media">
+                <img
+                  src={toUrl(images.projects[project.image].replace(/^\/+/, ''))}
+                  alt={project.imageAlt}
+                  width="1200"
+                  height="750"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <span class="chip chip--ok project-status">{project.status}</span>
+              </div>
+
+              <div class="project-body">
+                <div class="project-meta">
+                  <span class="micro-label">{project.year}</span>
+                  <span class="micro-label">{t('projects.techLabel')}</span>
+                </div>
+
+                <h2 class="project-title">{project.title}</h2>
+                <p class="project-summary">{project.summary}</p>
+                <p class="project-description">{project.description}</p>
+
+                <div class="chips" role="group" aria-label={t('projects.techLabel')}>
+                  {project.tags.map((tag) => (
+                    <span class="chip">{tag}</span>
+                  ))}
+                </div>
+
+                <div class="project-actions" role="group" aria-label={t('projects.linksLabel')}>
+                  <a
+                    class="project-link"
+                    href={project.repo}
+                    target={isExternal(project.repo) ? '_blank' : undefined}
+                    rel={isExternal(project.repo) ? 'noopener noreferrer' : undefined}
+                    aria-label={`${t('common.viewRepo')}: ${project.title}`}
+                  >
+                    <i class="bi bi-github" aria-hidden="true" />
+                    <span>{t('common.viewRepo')}</span>
+                  </a>
+                  {project.demo && (
+                    <a
+                      class="project-link"
+                      href={project.demo}
+                      target={isExternal(project.demo) ? '_blank' : undefined}
+                      rel={isExternal(project.demo) ? 'noopener noreferrer' : undefined}
+                      aria-label={`${t('common.viewDemo')}: ${project.title}`}
+                    >
+                      <i class="bi bi-box-arrow-up-right" aria-hidden="true" />
+                      <span>{t('common.viewDemo')}</span>
+                    </a>
+                  )}
+                </div>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+</BaseLayout>

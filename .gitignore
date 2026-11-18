@@ -1,0 +1,22 @@
+# Build output
+dist/
+.astro/
+
+# Dependencies
+node_modules/
+
+# Environment files (documented in README.md instead of committed)
+.env
+.env.*
+!.env.example
+
+# Editor and OS noise
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log
+
+# Package manager caches
+.npm/
+.pnpm-store/

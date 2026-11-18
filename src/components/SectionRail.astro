@@ -1,0 +1,43 @@
+---
+import { navigation } from '../data/navigation';
+import type { NavKey } from '../data/navigation';
+import type { Lang } from '../i18n/ui';
+import { localizePath, useTranslations } from '../i18n/utils';
+
+interface Props {
+  lang: Lang;
+  section?: NavKey | null;
+}
+
+const { lang, section = null } = Astro.props;
+const t = useTranslations(lang);
+
+const items = navigation.map((item, index) => ({
+  key: item.key,
+  href: localizePath(lang, item.path),
+  label: t(item.labelKey),
+  index: String(index + 1).padStart(2, '0'),
+}));
+---
+
+<nav class="section-rail" aria-label={t('common.sectionNav')}>
+  <ol class="section-rail-list">
+    {
+      items.map((item) => (
+        <li>
+          <a
+            class="section-rail-link"
+            href={item.href}
+            aria-current={item.key === section ? 'page' : undefined}
+            aria-label={`${t('common.sectionPrefix')} ${item.index}: ${item.label}`}
+          >
+            <span aria-hidden="true">{item.index}</span>
+            <span class="section-rail-label" aria-hidden="true">
+              {item.label}
+            </span>
+          </a>
+        </li>
+      ))
+    }
+  </ol>
+</nav>

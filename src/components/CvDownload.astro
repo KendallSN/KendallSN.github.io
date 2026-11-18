@@ -1,0 +1,27 @@
+---
+import { site } from '../data/site';
+import type { Lang } from '../i18n/ui';
+import { useTranslations } from '../i18n/utils';
+import { toUrl } from '../lib/url';
+
+interface Props {
+  lang: Lang;
+  variant?: 'compact' | 'full' | 'header';
+}
+
+const { lang, variant = 'compact' } = Astro.props;
+const t = useTranslations(lang);
+const href = toUrl(site.cv[lang].replace(/^\/+/, ''));
+const label = variant === 'header' ? t('common.cvShort') : t('common.downloadCv');
+---
+
+<a
+  class:list={['btn', 'btn-cv', variant === 'full' ? '' : 'btn--sm']}
+  href={href}
+  download
+  aria-label={t('common.downloadCvLabel')}
+  title={`${t('common.downloadCv')} (PDF)`}
+>
+  <i class="bi bi-filetype-pdf" aria-hidden="true"></i>
+  <span class="btn-cv-label">{label}</span>
+</a>

@@ -1,0 +1,30 @@
+---
+import { site } from '../data/site';
+import type { Lang } from '../i18n/ui';
+import { useTranslations } from '../i18n/utils';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<ul class="social-row" aria-label={t('common.socialLabel')}>
+  {
+    site.socials.map((social) => (
+      <li>
+        <a
+          class="social-link"
+          href={social.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`${social.label} (${t('common.newTab')})`}
+        >
+          <i class:list={['bi', social.icon]} aria-hidden="true" />
+        </a>
+      </li>
+    ))
+  }
+</ul>

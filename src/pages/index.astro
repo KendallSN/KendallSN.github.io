@@ -1,0 +1,28 @@
+---
+import { site } from '../data/site';
+import { toUrl } from '../lib/url';
+
+const esUrl = toUrl('es/');
+const enUrl = toUrl('en/');
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{site.profile.name} · Portafolio</title>
+    <meta name="robots" content="noindex" />
+    <link rel="canonical" href={esUrl} />
+    <meta http-equiv="refresh" content={`0; url=${esUrl}`} />
+    <script is:inline define:vars={{ esUrl }}>
+      window.location.replace(esUrl);
+    </script>
+  </head>
+  <body>
+    <p>
+      <a href={esUrl}>Ir al portafolio en español</a> ·
+      <a href={enUrl}>Go to the English portfolio</a>
+    </p>
+  </body>
+</html>

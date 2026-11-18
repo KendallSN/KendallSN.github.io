@@ -1,0 +1,308 @@
+---
+import { site } from '../data/site';
+import type { Lang } from '../i18n/ui';
+import { useTranslations } from '../i18n/utils';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const endpoint = site.contactEndpoint.trim();
+const hasEndpoint = endpoint.length > 0;
+const mailtoAddress = site.profile.email;
+const formAction = hasEndpoint ? endpoint : `mailto:${mailtoAddress}`;
+const subjectPrefix = lang === 'es' ? 'Consulta desde el portafolio' : 'Inquiry from the portfolio';
+---
+
+<form
+  class="form-grid"
+  action={formAction}
+  method="post"
+  enctype={hasEndpoint ? 'application/x-www-form-urlencoded' : 'text/plain'}
+  data-contact-form
+  data-endpoint={endpoint}
+  data-mailto={mailtoAddress}
+  data-subject={subjectPrefix}
+  data-label-name={t('contact.name')}
+  data-label-email={t('contact.email')}
+  data-label-company={t('contact.company')}
+  data-msg-name={t('contact.errorName')}
+  data-msg-email={t('contact.errorEmail')}
+  data-msg-message={t('contact.errorMessage')}
+  data-msg-validation={t('contact.errorValidation')}
+  data-msg-submit={t('contact.errorSubmit')}
+  data-msg-network={t('contact.errorNetwork')}
+  data-msg-success={t('contact.success')}
+  data-msg-mailto={t('contact.mailtoSuccess')}
+  data-msg-sending={t('contact.sending')}
+  data-msg-label={t('contact.submit')}
+>
+  <div class="form-row">
+    <div class="field" data-field>
+      <label class="field-label" for="contact-name">
+        <span>{t('contact.name')}</span>
+        <span class="field-required" aria-hidden="true">*</span>
+      </label>
+      <input
+        class="field-input"
+        id="contact-name"
+        name="name"
+        type="text"
+        required
+        minlength="2"
+        autocomplete="name"
+        placeholder={t('contact.namePlaceholder')}
+        aria-describedby="contact-name-error"
+      />
+      <p class="field-error" id="contact-name-error" data-field-error></p>
+    </div>
+
+    <div class="field" data-field>
+      <label class="field-label" for="contact-email">
+        <span>{t('contact.email')}</span>
+        <span class="field-required" aria-hidden="true">*</span>
+      </label>
+      <input
+        class="field-input"
+        id="contact-email"
+        name="email"
+        type="email"
+        required
+        autocomplete="email"
+        inputmode="email"
+        placeholder={t('contact.emailPlaceholder')}
+        aria-describedby="contact-email-error"
+      />
+      <p class="field-error" id="contact-email-error" data-field-error></p>
+    </div>
+  </div>
+
+  <div class="field" data-field>
+    <label class="field-label" for="contact-company">
+      <span>{t('contact.company')}</span>
+      <span class="field-optional">{t('contact.companyOptional')}</span>
+    </label>
+    <input
+      class="field-input"
+      id="contact-company"
+      name="company"
+      type="text"
+      autocomplete="organization"
+      placeholder={t('contact.companyPlaceholder')}
+    />
+  </div>
+
+  <div class="field" data-field>
+    <label class="field-label" for="contact-message">
+      <span>{t('contact.message')}</span>
+      <span class="field-required" aria-hidden="true">*</span>
+    </label>
+    <textarea
+      class="field-input"
+      id="contact-message"
+      name="message"
+      required
+      minlength="20"
+      rows="6"
+      placeholder={t('contact.messagePlaceholder')}
+      aria-describedby="contact-message-error"
+    ></textarea>
+    <p class="field-error" id="contact-message-error" data-field-error></p>
+  </div>
+
+  <div class="hp-field" aria-hidden="true">
+    <label for="contact-gotcha">{t('contact.honeypot')}</label>
+    <input
+      id="contact-gotcha"
+      name="_gotcha"
+      type="text"
+      tabindex="-1"
+      autocomplete="off"
+      title={t('contact.honeypotLabel')}
+    />
+  </div>
+
+  <p class="field-hint">{t('contact.requiredHint')}</p>
+
+  <div class="form-status" role="status" aria-live="polite" aria-atomic="true" aria-label={t('contact.statusLabel')} data-form-status data-state="idle"></div>
+
+  <div class="form-footer">
+    <p>{t('contact.formPrivacy')}</p>
+    <button class="btn btn--primary" type="submit" data-form-submit>
+      <i class="bi bi-send" aria-hidden="true" data-submit-icon></i>
+      <span data-submit-label>{t('contact.submit')}</span>
+    </button>
+  </div>
+
+  <noscript>
+    <p class="field-hint">{t('contact.noJavascript')}</p>
+  </noscript>
+</form>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-contact-form]');
+
+  if (form) {
+    form.noValidate = true;
+
+    const data = form.dataset;
+    const endpoint = (data.endpoint ?? '').trim();
+    const mailto = data.mailto ?? '';
+    const subjectPrefix = data.subject ?? '';
+
+    const status = form.querySelector<HTMLElement>('[data-form-status]');
+    const submit = form.querySelector<HTMLButtonElement>('[data-form-submit]');
+    const submitLabel = form.querySelector<HTMLElement>('[data-submit-label]');
+    const submitIcon = form.querySelector<HTMLElement>('[data-submit-icon]');
+
+    type Field = HTMLInputElement | HTMLTextAreaElement;
+
+    const field = (name: string): Field | null =>
+      form.querySelector<Field>(`[name="${name}"]`);
+
+    const nameField = field('name');
+    const emailField = field('email');
+    const companyField = field('company');
+    const messageField = field('message');
+    const gotchaField = field('_gotcha');
+
+    const messages = {
+      name: data.msgName ?? '',
+      email: data.msgEmail ?? '',
+      message: data.msgMessage ?? '',
+      validation: data.msgValidation ?? '',
+      submit: data.msgSubmit ?? '',
+      network: data.msgNetwork ?? '',
+      success: data.msgSuccess ?? '',
+      mailto: data.msgMailto ?? '',
+      sending: data.msgSending ?? '',
+      label: data.msgLabel ?? '',
+    };
+
+    const setStatus = (state: 'idle' | 'pending' | 'success' | 'error', message: string) => {
+      if (!status) return;
+      status.dataset.state = state;
+      status.textContent = message;
+    };
+
+    const describe = (element: Field | null, message: string) => {
+      if (!element) return;
+      const wrapper = element.closest('[data-field]');
+      const error = wrapper?.querySelector<HTMLElement>('[data-field-error]');
+      if (message) {
+        element.setAttribute('aria-invalid', 'true');
+        if (error) error.textContent = message;
+      } else {
+        element.removeAttribute('aria-invalid');
+        if (error) error.textContent = '';
+      }
+    };
+
+    const ruleFor = (element: Field, key: 'name' | 'email' | 'message'): string => {
+      const state = element.validity;
+      if (state.valueMissing || state.tooShort) return messages[key];
+      if (key === 'email' && state.typeMismatch) return messages[key];
+      return '';
+    };
+
+    const checks: Array<[Field | null, 'name' | 'email' | 'message']> = [
+      [nameField, 'name'],
+      [emailField, 'email'],
+      [messageField, 'message'],
+    ];
+
+    const validate = (): boolean => {
+      let valid = true;
+      for (const [element, key] of checks) {
+        if (!element) continue;
+        const message = element.validity.valid ? '' : ruleFor(element, key);
+        describe(element, message);
+        if (message) valid = false;
+      }
+      return valid;
+    };
+
+    const setPending = (pending: boolean) => {
+      form.dataset.pending = String(pending);
+      form.setAttribute('aria-busy', String(pending));
+      if (submit) {
+        submit.disabled = pending;
+        submit.setAttribute('aria-busy', String(pending));
+      }
+      if (submitLabel) submitLabel.textContent = pending ? messages.sending : messages.label;
+      if (submitIcon) submitIcon.className = pending ? 'bi bi-hourglass-split' : 'bi bi-send';
+    };
+
+    let attempted = false;
+
+    form.addEventListener('input', () => {
+      if (attempted) validate();
+    });
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (form.dataset.pending === 'true') return;
+      attempted = true;
+
+      if (!form.checkValidity() || !validate()) {
+        form.reportValidity();
+        setStatus('error', messages.validation);
+        return;
+      }
+
+      if (gotchaField && gotchaField.value.trim() !== '') {
+        setStatus('success', messages.success);
+        form.reset();
+        attempted = false;
+        return;
+      }
+
+      if (!endpoint) {
+        const name = nameField?.value.trim() ?? '';
+        const email = emailField?.value.trim() ?? '';
+        const company = companyField?.value.trim() ?? '';
+        const message = messageField?.value ?? '';
+        const lines = [`${data.labelName ?? ''}: ${name}`, `${data.labelEmail ?? ''}: ${email}`];
+        if (company) lines.push(`${data.labelCompany ?? ''}: ${company}`);
+        lines.push('', message);
+        const body = lines.join('\n');
+
+        const href = `mailto:${mailto}?subject=${encodeURIComponent(
+          `${subjectPrefix} - ${name}`,
+        )}&body=${encodeURIComponent(body)}`;
+
+        window.location.href = href;
+        setStatus('success', messages.mailto);
+        return;
+      }
+
+      setPending(true);
+      setStatus('pending', messages.sending);
+
+      try {
+        const payload = new FormData(form);
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          body: payload,
+          headers: { Accept: 'application/json' },
+        });
+        const result = (await response.json().catch(() => null)) as { ok?: boolean } | null;
+
+        if (response.ok && result?.ok === true) {
+          form.reset();
+          attempted = false;
+          setStatus('success', messages.success);
+        } else {
+          setStatus('error', messages.submit);
+        }
+      } catch {
+        setStatus('error', messages.network);
+      } finally {
+        setPending(false);
+      }
+    });
+  }
+</script>

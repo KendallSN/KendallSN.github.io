@@ -1,0 +1,99 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ContactForm from '../../components/ContactForm.astro';
+import CvDownload from '../../components/CvDownload.astro';
+import SocialLinks from '../../components/SocialLinks.astro';
+import PageHero from '../../components/PageHero.astro';
+import { content } from '../../data/content';
+import { site } from '../../data/site';
+import { defaultLang, type Lang } from '../../i18n/ui';
+import { isLang, languagePaths, useTranslations } from '../../i18n/utils';
+
+export function getStaticPaths() {
+  return languagePaths();
+}
+
+const raw = Astro.params.lang;
+const lang: Lang = isLang(raw) ? raw : defaultLang;
+const t = useTranslations(lang);
+const page = content[lang].contact;
+const profile = site.profile;
+---
+
+<BaseLayout
+  lang={lang}
+  title={page.intro.title}
+  description={page.intro.description}
+  section="contact"
+>
+  <PageHero
+    lang={lang}
+    section="contact"
+    index="06"
+    eyebrow={page.intro.eyebrow}
+    title={page.intro.title}
+    description={page.intro.description}
+  />
+
+  <section class="section">
+    <div class="container contact-grid">
+      <div class="contact-info">
+        <div class="card tick-card stack" data-reveal>
+          <span class="availability-badge">{profile.availability[lang]}</span>
+          <h2>{t('contact.infoTitle')}</h2>
+          <p class="muted">{t('contact.infoSubtitle')}</p>
+
+          <dl class="info-list">
+            <div class="info-row">
+              <dt>{t('contact.emailLabel')}</dt>
+              <dd><a href={`mailto:${profile.email}`}>{profile.email}</a></dd>
+            </div>
+            <div class="info-row">
+              <dt>{t('contact.phoneLabel')}</dt>
+              <dd>
+                <a href={profile.phoneHref} aria-label={`${t('contact.phoneLabel')}: ${profile.phone}`}>
+                  {profile.phone}
+                </a>
+              </dd>
+            </div>
+            <div class="info-row">
+              <dt>{t('contact.locationLabel')}</dt>
+              <dd>{profile.location[lang]}</dd>
+            </div>
+            <div class="info-row">
+              <dt>{t('contact.responseLabel')}</dt>
+              <dd>{profile.responseTime[lang]}</dd>
+            </div>
+            <div class="info-row">
+              <dt>{t('contact.preferredLabel')}</dt>
+              <dd>{profile.preferredChannel[lang]}</dd>
+            </div>
+          </dl>
+
+          <div class="stack">
+            <span class="micro-label">{t('common.socialLabel')}</span>
+            <SocialLinks lang={lang} />
+          </div>
+
+          <div>
+            <CvDownload lang={lang} variant="full" />
+          </div>
+        </div>
+
+        <p class="muted measure" data-reveal>{page.closing}</p>
+      </div>
+
+      <div class="card tick-card contact-form-card" data-reveal>
+        <div class="stack section-head">
+          <div class="stack">
+            <span class="eyebrow">{t('nav.contact')}</span>
+            <h2>{t('contact.formTitle')}</h2>
+          </div>
+          <p>{t('contact.formSubtitle')}</p>
+        </div>
+
+        <ContactForm lang={lang} />
+      </div>
+    </div>
+  </section>
+</BaseLayout>

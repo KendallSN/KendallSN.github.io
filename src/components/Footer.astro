@@ -1,0 +1,71 @@
+---
+import CvDownload from './CvDownload.astro';
+import SocialLinks from './SocialLinks.astro';
+import { navigation } from '../data/navigation';
+import { site } from '../data/site';
+import type { Lang } from '../i18n/ui';
+import { localizePath, useTranslations } from '../i18n/utils';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div class="footer-brand">
+      <span class="brand-name">{site.profile.name}</span>
+      <p>{site.profile.role[lang]} · {site.profile.location[lang]}</p>
+      <SocialLinks lang={lang} />
+    </div>
+
+    <div>
+      <h2 class="footer-title">{t('common.footerNavigation')}</h2>
+      <ul class="footer-list">
+        {
+          navigation.map((item) => (
+            <li>
+              <a href={localizePath(lang, item.path)}>
+                <i class:list={['bi', item.icon]} aria-hidden="true" />
+                <span>{t(item.labelKey)}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <div>
+      <h2 class="footer-title">{t('common.footerContact')}</h2>
+      <ul class="footer-list">
+        <li>
+          <a href={`mailto:${site.profile.email}`}>
+            <i class="bi bi-envelope" aria-hidden="true" />
+            <span>{site.profile.email}</span>
+          </a>
+        </li>
+        <li>
+          <a href={site.profile.phoneHref} aria-label={`${t('contact.phoneLabel')}: ${site.profile.phone}`}>
+            <i class="bi bi-telephone" aria-hidden="true" />
+            <span>{site.profile.phone}</span>
+          </a>
+        </li>
+        <li>
+          <CvDownload lang={lang} />
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="container footer-bottom">
+    <span>© {year} {site.profile.name}. {t('common.rights')}</span>
+    <span class="footer-note">
+      <i class="bi bi-code-slash" aria-hidden="true" />
+      <span>{t('common.footerBuiltWith')}</span>
+    </span>
+  </div>
+</footer>

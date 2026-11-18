@@ -1,0 +1,105 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import { content } from '../../data/content';
+import { defaultLang, type Lang } from '../../i18n/ui';
+import { isLang, languagePaths, useTranslations } from '../../i18n/utils';
+
+export function getStaticPaths() {
+  return languagePaths();
+}
+
+const raw = Astro.params.lang;
+const lang: Lang = isLang(raw) ? raw : defaultLang;
+const t = useTranslations(lang);
+const page = content[lang].skills;
+
+/** Qualitative band for a 0-100 level. The numeric value stays in the aria attributes. */
+const bandKey = (level: number) =>
+  level >= 85
+    ? ('skills.bandAdvanced' as const)
+    : level >= 65
+      ? ('skills.bandIntermediate' as const)
+      : ('skills.bandBasic' as const);
+const bandLabel = (level: number) => t(bandKey(level));
+---
+
+<BaseLayout
+  lang={lang}
+  title={page.intro.title}
+  description={page.intro.description}
+  section="skills"
+>
+  <PageHero
+    lang={lang}
+    section="skills"
+    index="04"
+    eyebrow={page.intro.eyebrow}
+    title={page.intro.title}
+    description={page.intro.description}
+  />
+
+  <section class="section">
+    <div class="container stack-lg">
+      <ul class="skills-grid" aria-label={t('skills.groupsLabel')}>
+        {
+          page.groups.map((group) => (
+            <li class="card tick-card card-hover skill-card" data-reveal data-spotlight>
+              <div class="skill-card-head">
+                <span class="icon-badge">
+                  <i class:list={['bi', group.icon]} aria-hidden="true" />
+                </span>
+                <span class="skill-level-value">{bandLabel(group.level)}</span>
+              </div>
+
+              <h2>{group.title}</h2>
+              <p>{group.description}</p>
+
+              <div
+                class="bar"
+                role="progressbar"
+                aria-label={`${t('skills.levelLabel')}: ${group.title} (${bandLabel(group.level)})`}
+                aria-valuemin="0"
+                aria-valuemax="100"
+                aria-valuenow={group.level}
+              >
+                <span class="bar-fill" style={`width: ${group.level}%`}></span>
+              </div>
+
+              <ul class="skill-list">
+                {group.skills.map((skill) => (
+                  <li class="skill-row">
+                    <span class="skill-name">{skill.name}</span>
+                    <span
+                      class="bar"
+                      role="progressbar"
+                      aria-label={`${skill.name}: ${t('skills.levelCaption')} ${bandLabel(skill.level)}`}
+                      aria-valuemin="0"
+                      aria-valuemax="100"
+                      aria-valuenow={skill.level}
+                    >
+                      <span class="bar-fill bar-fill--violet" style={`width: ${skill.level}%`} />
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ))
+        }
+      </ul>
+
+      <div class="card tick-card toolbox" data-reveal>
+        <div class="section-head">
+          <div class="stack">
+            <span class="eyebrow">{t('skills.toolboxLabel')}</span>
+            <h2>{page.toolbox.title}</h2>
+          </div>
+          <p>{page.toolbox.description}</p>
+        </div>
+        <div class="chips">
+          {page.toolbox.tags.map((tag) => <span class="chip chip--accent">{tag}</span>)}
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

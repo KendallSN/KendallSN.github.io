@@ -1,0 +1,235 @@
+---
+import 'bootstrap-icons/font/bootstrap-icons.css';
+import '../styles/global.css';
+
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import SectionRail from '../components/SectionRail.astro';
+import type { NavKey } from '../data/navigation';
+import { navigation } from '../data/navigation';
+import { images, site } from '../data/site';
+import { languageMeta, languages } from '../i18n/ui';
+import type { Lang } from '../i18n/ui';
+import { localizePath, useTranslations } from '../i18n/utils';
+import { toUrl } from '../lib/url';
+
+interface Props {
+  lang: Lang;
+  title: string;
+  description: string;
+  section?: NavKey;
+  image?: string;
+  noindex?: boolean;
+}
+
+const {
+  lang,
+  title,
+  description,
+  section,
+  image = toUrl(images.og.replace(/^\/+/, '')),
+  noindex = false,
+} = Astro.props;
+
+const t = useTranslations(lang);
+const meta = languageMeta[lang];
+const siteUrl = Astro.site ?? new URL(Astro.url.origin);
+const navItem = section ? navigation.find((item) => item.key === section) : undefined;
+
+const canonicalPath = navItem ? localizePath(lang, navItem.path) : toUrl('');
+const canonical = new URL(canonicalPath, siteUrl).href;
+const alternateUrls = navItem
+  ? languages.map((code) => ({
+      code,
+      href: new URL(localizePath(code, navItem.path), siteUrl).href,
+    }))
+  : [];
+const defaultAlternate = navItem
+  ? new URL(localizePath('es', navItem.path), siteUrl).href
+  : canonical;
+const ogImage = image.startsWith('http') ? image : new URL(image, siteUrl).href;
+const pageTitle = `${title} | ${site.profile.name}`;
+---
+
+<!doctype html>
+<html lang={meta.htmlLang} class="no-js">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="author" content={site.profile.name} />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="theme-color" content="#05070d" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="robots" content={noindex ? 'noindex, nofollow' : 'index, follow'} />
+
+    <link rel="icon" type="image/svg+xml" href={toUrl('favicon.svg')} />
+    <link rel="canonical" href={canonical} />
+    {
+      alternateUrls.map((alternate) => (
+        <link rel="alternate" hreflang={alternate.code} href={alternate.href} />
+      ))
+    }
+    <link rel="alternate" hreflang="x-default" href={defaultAlternate} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.profile.name} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:alt" content={pageTitle} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content={meta.ogLocale} />
+    <meta property="og:locale:alternate" content={meta.code === 'es' ? 'en_US' : 'es_MX'} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={pageTitle} />
+
+    <script is:inline>
+      document.documentElement.classList.remove('no-js');
+      document.documentElement.classList.add('js');
+      window.setTimeout(function () {
+        var root = document.documentElement;
+        if (!root.classList.contains('reveal-ready')) root.classList.add('reveal-fallback');
+      }, 2200);
+    </script>
+  </head>
+
+  <body>
+    <a class="skip-link" href="#main">{t('common.skipToContent')}</a>
+
+    <div class="scroll-progress" aria-hidden="true">
+      <span data-scroll-progress></span>
+    </div>
+
+    <div class="backdrop" aria-hidden="true">
+      <div class="backdrop-grid"></div>
+      <div class="backdrop-glow"></div>
+    </div>
+
+    <Header lang={lang} section={section ?? null} />
+
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+
+    <SectionRail lang={lang} section={section ?? null} />
+
+    <Footer lang={lang} />
+
+    <script>
+      try {
+        const root = document.documentElement;
+        const items = Array.from(document.querySelectorAll<HTMLElement>('[data-reveal]'));
+        const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        items.forEach((item, index) => {
+          item.style.setProperty('--reveal-index', String(index % 6));
+        });
+
+        if (reduced || !('IntersectionObserver' in window)) {
+          items.forEach((item) => item.classList.add('is-revealed'));
+        } else {
+          root.classList.add('reveal-ready');
+          const observer = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((entry) => {
+                if (!entry.isIntersecting) return;
+                entry.target.classList.add('is-revealed');
+                observer.unobserve(entry.target);
+              });
+            },
+            { rootMargin: '0px 0px -8% 0px', threshold: 0.08 },
+          );
+          items.forEach((item) => observer.observe(item));
+        }
+      } catch {
+        document
+          .querySelectorAll<HTMLElement>('[data-reveal]')
+          .forEach((item) => item.classList.add('is-revealed'));
+      }
+
+      // Scroll progress bar -------------------------------------------------
+      const progress = document.querySelector<HTMLElement>('[data-scroll-progress]');
+
+      if (progress) {
+        let progressFrame = 0;
+
+        const paintProgress = () => {
+          progressFrame = 0;
+          const doc = document.documentElement;
+          const max = doc.scrollHeight - window.innerHeight;
+          const ratio = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+          progress.style.transform = `scaleX(${ratio.toFixed(4)})`;
+        };
+
+        const requestProgress = () => {
+          if (!progressFrame) progressFrame = window.requestAnimationFrame(paintProgress);
+        };
+
+        window.addEventListener('scroll', requestProgress, { passive: true });
+        window.addEventListener('resize', requestProgress, { passive: true });
+        paintProgress();
+      }
+
+      // Pointer spotlight ---------------------------------------------------
+      try {
+        const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+        const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const spotTarget = (node: EventTarget | null): HTMLElement | null =>
+          node instanceof Element ? node.closest<HTMLElement>('[data-spotlight]') : null;
+
+        if (finePointer.matches && !reduced) {
+          let spotlightFrame = 0;
+          let active: HTMLElement | null = null;
+          let lastX = 0;
+          let lastY = 0;
+
+          const paintSpotlight = () => {
+            spotlightFrame = 0;
+            if (!active) return;
+            const rect = active.getBoundingClientRect();
+            active.style.setProperty('--mx', `${(lastX - rect.left).toFixed(1)}px`);
+            active.style.setProperty('--my', `${(lastY - rect.top).toFixed(1)}px`);
+          };
+
+          document.addEventListener(
+            'pointermove',
+            (event) => {
+              const target = spotTarget(event.target);
+              if (target !== active) {
+                active?.style.setProperty('--spot', '0');
+                active = target;
+                active?.style.setProperty('--spot', '1');
+              }
+              if (!active) return;
+              lastX = event.clientX;
+              lastY = event.clientY;
+              if (!spotlightFrame) spotlightFrame = window.requestAnimationFrame(paintSpotlight);
+            },
+            { passive: true },
+          );
+
+          document.addEventListener(
+            'pointerout',
+            (event) => {
+              if (!active) return;
+              const next = event.relatedTarget;
+              if (next instanceof Node && active.contains(next)) return;
+              active.style.setProperty('--spot', '0');
+              active = null;
+            },
+            { passive: true },
+          );
+        }
+      } catch {
+        /* decorative only */
+      }
+    </script>
+  </body>
+</html>
