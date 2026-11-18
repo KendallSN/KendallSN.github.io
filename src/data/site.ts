@@ -46,8 +46,20 @@ export const site = {
       en: 'Email or contact form',
     },
   },
-  /** Replace with your own Formspree-compatible endpoint, or leave empty to use mailto. */
-  contactEndpoint: import.meta.env.PUBLIC_CONTACT_ENDPOINT ?? '',
+  /**
+   * Contact form — Web3Forms (https://web3forms.com).
+   *
+   * The Access Key comes ONLY from the `PUBLIC_WEB3FORMS_ACCESS_KEY`
+   * environment variable (local `.env` file or a GitHub Actions repository
+   * variable). It is never hardcoded here.
+   *
+   * The key is public by design: Web3Forms requires it in the browser, so it
+   * ships with the page. While it is unset, the form falls back to `mailto:`.
+   */
+  contact: {
+    endpoint: 'https://api.web3forms.com/submit',
+    accessKey: (import.meta.env.PUBLIC_WEB3FORMS_ACCESS_KEY ?? '').trim(),
+  },
   cv: {
     es: '/cv/CV-Espanol.pdf',
     en: '/cv/CV-English.pdf',

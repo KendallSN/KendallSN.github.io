@@ -1,8 +1,8 @@
 /// <reference types="astro/client" />
 
 interface ImportMetaEnv {
-  /** Formspree-compatible endpoint used by the contact form. Safe to expose. */
-  readonly PUBLIC_CONTACT_ENDPOINT?: string;
+  /** Web3Forms Access Key used by the contact form. Public by design. */
+  readonly PUBLIC_WEB3FORMS_ACCESS_KEY?: string;
 }
 
 interface ImportMeta {

@@ -2,49 +2,49 @@
   
   <defs>
     <radialGradient id="glowA" cx="18%" cy="12%" r="72%">
-      <stop offset="0" stop-color="#38bdf8" stop-opacity=".34"/>
-      <stop offset="1" stop-color="#38bdf8" stop-opacity="0"/>
+      <stop offset="0" stop-color="#c86bfa" stop-opacity=".34"/>
+      <stop offset="1" stop-color="#c86bfa" stop-opacity="0"/>
     </radialGradient>
     <radialGradient id="glowB" cx="86%" cy="88%" r="70%">
-      <stop offset="0" stop-color="#34d399" stop-opacity=".24"/>
-      <stop offset="1" stop-color="#34d399" stop-opacity="0"/>
+      <stop offset="0" stop-color="#fdc500" stop-opacity=".24"/>
+      <stop offset="1" stop-color="#fdc500" stop-opacity="0"/>
     </radialGradient>
     <linearGradient id="edge" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#38bdf8" stop-opacity=".55"/>
-      <stop offset=".55" stop-color="#38bdf8" stop-opacity=".08"/>
-      <stop offset="1" stop-color="#34d399" stop-opacity=".4"/>
+      <stop offset="0" stop-color="#c86bfa" stop-opacity=".55"/>
+      <stop offset=".55" stop-color="#c86bfa" stop-opacity=".08"/>
+      <stop offset="1" stop-color="#fdc500" stop-opacity=".4"/>
     </linearGradient>
     <pattern id="gridP" width="48" height="48" patternUnits="userSpaceOnUse">
-      <path d="M48 0H0v48" fill="none" stroke="#8fb4ff" stroke-opacity=".06"/>
+      <path d="M48 0H0v48" fill="none" stroke="#c9a2ff" stroke-opacity=".06"/>
     </pattern>
     <pattern id="hexP" width="58" height="100" patternUnits="userSpaceOnUse">
-      <path d="M29 1 57 17v33L29 66 1 50V17Z" fill="none" stroke="#38bdf8" stroke-opacity=".1"/>
+      <path d="M29 1 57 17v33L29 66 1 50V17Z" fill="none" stroke="#c86bfa" stroke-opacity=".1"/>
     </pattern>
     <linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#05070d" stop-opacity="0"/>
-      <stop offset=".72" stop-color="#05070d" stop-opacity=".45"/>
-      <stop offset="1" stop-color="#05070d" stop-opacity=".92"/>
+      <stop offset="0" stop-color="#03071e" stop-opacity="0"/>
+      <stop offset=".72" stop-color="#03071e" stop-opacity=".45"/>
+      <stop offset="1" stop-color="#03071e" stop-opacity=".92"/>
     </linearGradient>
   </defs>
-  <rect width="800" height="800" fill="#03050a"/>
+  <rect width="800" height="800" fill="#01030c"/>
   <rect width="800" height="800" fill="url(#gridP)"/>
   <rect width="800" height="800" fill="url(#glowA)" opacity=".7"/>
-  <rect x="40" y="40" width="720" height="720" rx="18" fill="#0b1220" fill-opacity=".55" stroke="url(#edge)"/>
-  <rect x="66" y="66" width="668" height="668" rx="12" fill="none" stroke="#8fb4ff" stroke-opacity=".14" stroke-dasharray="4 10"/>
-  <g stroke="#38bdf8" stroke-opacity=".6" fill="none">
+  <rect x="40" y="40" width="720" height="720" rx="18" fill="#0b0522" fill-opacity=".55" stroke="url(#edge)"/>
+  <rect x="66" y="66" width="668" height="668" rx="12" fill="none" stroke="#c9a2ff" stroke-opacity=".14" stroke-dasharray="4 10"/>
+  <g stroke="#c86bfa" stroke-opacity=".6" fill="none">
       <path d="M40 120V56a16 16 0 0 1 16-16h64"/>
       <path d="M680 40h64a16 16 0 0 1 16 16v64"/>
       <path d="M760 680v64a16 16 0 0 1-16 16h-64"/>
       <path d="M120 760H56a16 16 0 0 1-16-16v-64"/>
     </g>
-  <g fill="#8fb4ff" fill-opacity=".12" stroke="#38bdf8" stroke-opacity=".28">
+  <g fill="#c9a2ff" fill-opacity=".12" stroke="#c86bfa" stroke-opacity=".28">
       <circle cx="400" cy="318" r="104"/>
       <path d="M188 700c0-118 95-196 212-196s212 78 212 196Z"/>
     </g>
-  <circle cx="400" cy="318" r="132" fill="none" stroke="#38bdf8" stroke-opacity=".18" stroke-dasharray="3 9"/>
-  <path d="M400 170v-46M400 466v46M252 318h-46M548 318h46" stroke="#34d399" stroke-opacity=".4"/>
-  <text x="400" y="640" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="22" letter-spacing="3" fill="#38bdf8" fill-opacity="0.75" text-anchor="middle">YOUR PHOTO</text>
-  <text x="400" y="678" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" letter-spacing="3" fill="#93a4bf" fill-opacity="0.45" text-anchor="middle">800 x 800 // JPG / PNG</text>
-  <text x="66" y="108" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" letter-spacing="3" fill="#93a4bf" fill-opacity="0.5" text-anchor="start">PORTRAIT SLOT</text>
-  <text x="734" y="744" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" letter-spacing="3" fill="#93a4bf" fill-opacity="0.4" text-anchor="end">FRAME 01</text>
+  <circle cx="400" cy="318" r="132" fill="none" stroke="#c86bfa" stroke-opacity=".18" stroke-dasharray="3 9"/>
+  <path d="M400 170v-46M400 466v46M252 318h-46M548 318h46" stroke="#fdc500" stroke-opacity=".4"/>
+  <text x="400" y="640" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="22" letter-spacing="3" fill="#c86bfa" fill-opacity="0.75" text-anchor="middle">YOUR PHOTO</text>
+  <text x="400" y="678" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" letter-spacing="3" fill="#a89ec6" fill-opacity="0.45" text-anchor="middle">800 x 800 // JPG / PNG</text>
+  <text x="66" y="108" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" letter-spacing="3" fill="#a89ec6" fill-opacity="0.5" text-anchor="start">PORTRAIT SLOT</text>
+  <text x="734" y="744" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" letter-spacing="3" fill="#a89ec6" fill-opacity="0.4" text-anchor="end">FRAME 01</text>
 </svg>

@@ -172,12 +172,16 @@ check(4, 'CV link matches the page language', (fail) => {
 });
 
 /* 5 ---------------------------------------------------------------------- */
-check(5, 'contact page contains the real form and endpoint wiring', (fail) => {
+check(5, 'contact page contains the real form and Web3Forms wiring', (fail) => {
   for (const locale of LOCALES) {
     const html = read(pagePath(locale, 'contact'));
     if (!html.includes('<form')) fail(`${locale} contact page has no <form> element`);
     if (!html.includes('data-contact-form')) fail(`${locale} contact page lacks data-contact-form`);
     if (!html.includes('data-endpoint')) fail(`${locale} contact page lacks data-endpoint`);
+    if (!html.includes('https://api.web3forms.com/submit')) {
+      fail(`${locale} contact page does not post to Web3Forms`);
+    }
+    if (!html.includes('name="access_key"')) fail(`${locale} contact page lacks the access_key field`);
     if (!html.includes('aria-live="polite"')) fail(`${locale} contact page lacks an aria-live region`);
     if (!html.includes('name="_gotcha"')) fail(`${locale} contact page lacks the honeypot field`);
   }

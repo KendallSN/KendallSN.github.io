@@ -1,7 +1,8 @@
 ---
 import { site } from '../data/site';
 import type { Lang } from '../i18n/ui';
-import { useTranslations } from '../i18n/utils';
+import { localizePath, useTranslations } from '../i18n/utils';
+import { toUrl } from '../lib/url';
 
 interface Props {
   lang: Lang;
@@ -10,11 +11,16 @@ interface Props {
 const { lang } = Astro.props;
 const t = useTranslations(lang);
 
-const endpoint = site.contactEndpoint.trim();
-const hasEndpoint = endpoint.length > 0;
+const endpoint = site.contact.endpoint;
+const accessKey = site.contact.accessKey;
+const hasEndpoint = accessKey.length > 0;
 const mailtoAddress = site.profile.email;
 const formAction = hasEndpoint ? endpoint : `mailto:${mailtoAddress}`;
 const subjectPrefix = lang === 'es' ? 'Consulta desde el portafolio' : 'Inquiry from the portfolio';
+const redirectTo = new URL(
+  `${toUrl(localizePath(lang, '/contact/'))}?sent=true`,
+  Astro.site ?? 'https://kendallsn.github.io',
+).href;
 ---
 
 <form
@@ -24,6 +30,8 @@ const subjectPrefix = lang === 'es' ? 'Consulta desde el portafolio' : 'Inquiry 
   enctype={hasEndpoint ? 'application/x-www-form-urlencoded' : 'text/plain'}
   data-contact-form
   data-endpoint={endpoint}
+  data-access-key={accessKey}
+  data-redirect={redirectTo}
   data-mailto={mailtoAddress}
   data-subject={subjectPrefix}
   data-label-name={t('contact.name')}
@@ -40,6 +48,12 @@ const subjectPrefix = lang === 'es' ? 'Consulta desde el portafolio' : 'Inquiry 
   data-msg-sending={t('contact.sending')}
   data-msg-label={t('contact.submit')}
 >
+  <input type="hidden" name="access_key" value={accessKey} />
+  <input type="hidden" name="subject" value={subjectPrefix} />
+  <input type="hidden" name="from_name" value={site.profile.name} />
+  <input type="hidden" name="redirect" value={redirectTo} />
+  <input type="checkbox" name="botcheck" class="hp-field" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
   <div class="form-row">
     <div class="field" data-field>
       <label class="field-label" for="contact-name">
@@ -150,6 +164,7 @@ const subjectPrefix = lang === 'es' ? 'Consulta desde el portafolio' : 'Inquiry 
 
     const data = form.dataset;
     const endpoint = (data.endpoint ?? '').trim();
+    const accessKey = (data.accessKey ?? '').trim();
     const mailto = data.mailto ?? '';
     const subjectPrefix = data.subject ?? '';
 
@@ -238,6 +253,14 @@ const subjectPrefix = lang === 'es' ? 'Consulta desde el portafolio' : 'Inquiry 
 
     let attempted = false;
 
+    /* Web3Forms redirects back with ?sent=true when JavaScript is off. */
+    if (new URLSearchParams(window.location.search).get('sent') === 'true') {
+      setStatus('success', messages.success);
+      const clean = new URL(window.location.href);
+      clean.searchParams.delete('sent');
+      window.history.replaceState({}, '', clean.pathname + clean.search + clean.hash);
+    }
+
     form.addEventListener('input', () => {
       if (attempted) validate();
     });
@@ -260,7 +283,7 @@ const subjectPrefix = lang === 'es' ? 'Consulta desde el portafolio' : 'Inquiry 
         return;
       }
 
-      if (!endpoint) {
+      if (!accessKey) {
         const name = nameField?.value.trim() ?? '';
         const email = emailField?.value.trim() ?? '';
         const company = companyField?.value.trim() ?? '';
@@ -289,9 +312,9 @@ const subjectPrefix = lang === 'es' ? 'Consulta desde el portafolio' : 'Inquiry 
           body: payload,
           headers: { Accept: 'application/json' },
         });
-        const result = (await response.json().catch(() => null)) as { ok?: boolean } | null;
+        const result = (await response.json().catch(() => null)) as { success?: boolean } | null;
 
-        if (response.ok && result?.ok === true) {
+        if (response.ok && result?.success === true) {
           form.reset();
           attempted = false;
           setStatus('success', messages.success);
