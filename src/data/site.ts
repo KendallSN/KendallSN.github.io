@@ -61,8 +61,8 @@ export const site = {
     accessKey: (import.meta.env.PUBLIC_WEB3FORMS_ACCESS_KEY ?? '').trim(),
   },
   cv: {
-    es: '/cv/CV-Espanol.pdf',
-    en: '/cv/CV-English.pdf',
+    es: '/cv/Kendall_Salazar_Ingeniero_Sistemas_CV.pdf',
+    en: '/cv/Kendall_Salazar_Software_Engineer_CV.pdf',
   } satisfies Record<Lang, string>,
   socials: [
     {
@@ -87,7 +87,7 @@ export const site = {
 export const images = {
   hero: '/images/hero-systems.svg',
   og: '/images/og-cover.svg',
-  avatar: '/images/avatar-placeholder.svg',
+  avatar: '/images/avatar-placeholder.jpg',
   backgrounds: {
     about: '/images/hero-systems.svg',
     education: '/images/bg-education.svg',

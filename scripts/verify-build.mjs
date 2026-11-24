@@ -42,8 +42,8 @@ const NAV_LABELS = {
 };
 
 const CV_FILES = {
-  es: 'CV-Espanol.pdf',
-  en: 'CV-English.pdf',
+  es: 'Kendall_Salazar_Ingeniero_Sistemas_CV.pdf',
+  en: 'Kendall_Salazar_Software_Engineer_CV.pdf',
 };
 
 const IMAGE_FILES = [
@@ -149,11 +149,11 @@ check(3, 'navigation renders the six localized labels', (fail) => {
 });
 
 /* 4 ---------------------------------------------------------------------- */
-check(4, 'CV link matches the page language', (fail) => {
+check(4, 'CV links match the page language and offer both options', (fail) => {
   for (const locale of LOCALES) {
     const expected = `${base}cv/${CV_FILES[locale]}`;
     const otherLocale = locale === 'es' ? 'en' : 'es';
-    const foreign = `cv/${CV_FILES[otherLocale]}`;
+    const foreign = `${base}cv/${CV_FILES[otherLocale]}`;
 
     for (const file of htmlByLocale[locale]) {
       const html = read(file);
@@ -163,7 +163,17 @@ check(4, 'CV link matches the page language', (fail) => {
       if (!new RegExp(`href="[^"]*${CV_FILES[locale]}"[^>]*download`).test(html)) {
         fail(`${relative(root, file)} link to ${CV_FILES[locale]} has no download attribute`);
       }
-      if (html.includes(foreign)) {
+
+      /* The dual-language picker is the only place allowed to link both CVs. */
+      const hasPicker = html.includes('data-cv-group');
+      if (hasPicker) {
+        if (!html.includes(`href="${foreign}"`)) {
+          fail(`${relative(root, file)} has a CV picker without the ${otherLocale} CV`);
+        }
+        if (!new RegExp(`href="[^"]*${CV_FILES[otherLocale]}"[^>]*download`).test(html)) {
+          fail(`${relative(root, file)} picker link to ${CV_FILES[otherLocale]} has no download attribute`);
+        }
+      } else if (html.includes(foreign)) {
         fail(`${relative(root, file)} links the other language CV (${foreign})`);
       }
     }

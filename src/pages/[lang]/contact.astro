@@ -22,18 +22,11 @@ const profile = site.profile;
 
 <BaseLayout
   lang={lang}
-  title={page.intro.title}
+  title={t('nav.contact')}
   description={page.intro.description}
   section="contact"
 >
-  <PageHero
-    lang={lang}
-    section="contact"
-    index="06"
-    eyebrow={page.intro.eyebrow}
-    title={page.intro.title}
-    description={page.intro.description}
-  />
+  <PageHero lang={lang} section="contact" index="06" title={t('nav.contact')} />
 
   <section class="section">
     <div class="container contact-grid">
@@ -83,7 +76,7 @@ const profile = site.profile;
         <p class="muted measure" data-reveal>{page.closing}</p>
       </div>
 
-      <div class="card tick-card contact-form-card" data-reveal>
+      <div class="card tick-card contact-form-card" id="contact-form" data-reveal>
         <div class="stack section-head">
           <div class="stack">
             <span class="eyebrow">{t('nav.contact')}</span>

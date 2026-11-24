@@ -199,7 +199,7 @@ Los SVG incluidos son decorativos y livianos. No contienen texto legible salvo m
 
 ## CV
 
-`public/cv/CV-Espanol.pdf` y `public/cv/CV-English.pdf` son los CV reales de Kendall Salazar Navarro. No los sobrescribas con marcadores de posición.
+`public/cv/Kendall_Salazar_Ingeniero_Sistemas_CV.pdf` y `public/cv/Kendall_Salazar_Software_Engineer_CV.pdf` son los CV reales de Kendall Salazar Navarro. No los sobrescribas con marcadores de posición.
 
 - El botón usa el atributo `download` y apunta al PDF del idioma activo.
 - Mantén una página, A4 o carta, con texto seleccionable.
@@ -234,7 +234,7 @@ Campos: nombre, correo, empresa (opcional) y mensaje. Incluye validación nativa
 - [x] Nombre, rol, correo, teléfono, ubicación y disponibilidad en `src/data/site.ts`
 - [x] URLs reales de GitHub y LinkedIn en `src/data/site.ts`
 - [x] Textos y datos reales de las seis secciones en `src/data/content.ts`
-- [x] CV reales en `public/cv/CV-Espanol.pdf` y `public/cv/CV-English.pdf`
+- [x] CV reales en `public/cv/Kendall_Salazar_Ingeniero_Sistemas_CV.pdf` y `public/cv/Kendall_Salazar_Software_Engineer_CV.pdf`
 - [ ] Retrato en `public/images/avatar-placeholder.svg` (o reemplazo con tu ruta)
 - [ ] Fondos de sección y miniaturas de proyectos (`public/images/project-*.svg`, `bg-*.svg`, `hero-systems.svg`)
 - [ ] `og-cover.svg` y `favicon.svg` con tu identidad

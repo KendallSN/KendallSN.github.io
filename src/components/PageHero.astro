@@ -9,9 +9,11 @@ interface Props {
   lang: Lang;
   section: SectionKey;
   index: string;
-  eyebrow: string;
+  /** Optional label shown next to the section number. */
+  eyebrow?: string;
   title: string;
-  description: string;
+  /** Optional supporting paragraph under the title. */
+  description?: string;
 }
 
 const { lang, section, index, eyebrow, title, description } = Astro.props;
@@ -26,9 +28,9 @@ const background = toUrl(images.backgrounds[section].replace(/^\/+/, ''));
   <div class="container page-hero__inner">
     <span class="page-hero__index">
       <strong>{t('common.sectionPrefix')} {index}</strong>
-      <span>{eyebrow}</span>
+      {eyebrow && <span>{eyebrow}</span>}
     </span>
     <h1 id="page-title" data-reveal>{title}</h1>
-    <p data-reveal>{description}</p>
+    {description && <p data-reveal>{description}</p>}
   </div>
 </section>

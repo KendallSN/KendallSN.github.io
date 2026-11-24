@@ -59,7 +59,7 @@ const stats = about.stats.map((stat) => {
         </div>
 
         <div class="cta-row">
-          <a class="btn btn--primary" href={localizePath(lang, '/contact/')}>
+          <a class="btn btn--primary" href={`${localizePath(lang, '/contact/')}#contact-form`}>
             <i class="bi bi-chat-square-text" aria-hidden="true"></i>
             <span>{t('about.ctaContact')}</span>
           </a>
@@ -84,10 +84,6 @@ const stats = about.stats.map((stat) => {
             decoding="async"
           />
         </div>
-        <p class="portrait-caption">
-          <span>{t('about.portraitLabel')}</span>
-          <span>{about.portraitCaption}</span>
-        </p>
       </div>
     </div>
   </section>

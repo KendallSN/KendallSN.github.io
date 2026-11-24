@@ -614,6 +614,14 @@ ol {
   transform: translateY(-1px);
 }
 
+/* Two CV options side by side (Spanish / English) */
+
+.cv-group {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
 /* Mobile navigation */
 
 .nav-toggle {
@@ -776,6 +784,37 @@ ol {
   max-width: 58ch;
   color: var(--muted);
   font-size: var(--step-1);
+}
+
+/*
+ * Every section except "About me" uses a slim header band: the section number
+ * and a small title sit at the top of the view instead of a tall hero.
+ * `.about-hero` keeps the full-size composition.
+ */
+
+.page-hero:not(.about-hero) {
+  padding-block: clamp(1.4rem, 2.6vw, 2rem);
+}
+
+.page-hero:not(.about-hero) .page-hero__inner {
+  gap: 0.5rem;
+}
+
+.page-hero:not(.about-hero) h1 {
+  font-size: clamp(1.3rem, 2.1vw, 1.65rem);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.page-hero:not(.about-hero) p {
+  max-width: 62ch;
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.page-hero:not(.about-hero) .page-hero__ghost {
+  font-size: clamp(4.5rem, 8vw, 7rem);
+  opacity: 0.7;
 }
 
 /* ==========================================================================
@@ -946,6 +985,7 @@ ol {
   align-items: center;
   gap: var(--space-3);
   padding-top: var(--space-2);
+  padding-bottom: var(--space-4);
 }
 
 .social-row {
@@ -979,61 +1019,32 @@ ol {
 .about-portrait {
   position: relative;
   justify-self: center;
-  width: min(100%, 420px);
+  width: min(100%, 320px);
 }
 
 .portrait-frame {
   position: relative;
-  padding: 2px;
+  padding: 3px;
   border: 0;
-  border-radius: 50%;
-  background: conic-gradient(
-    from 150deg,
-    rgba(200, 107, 250, 0.7),
-    rgba(253, 197, 0, 0.55),
-    rgba(61, 0, 102, 0.85),
-    rgba(200, 107, 250, 0.7)
+  border-radius: 1.75rem;
+  background: linear-gradient(
+    150deg,
+    rgba(200, 107, 250, 0.75),
+    rgba(253, 197, 0, 0.45) 55%,
+    rgba(61, 0, 102, 0.9)
   );
   box-shadow: 0 34px 80px -44px rgba(200, 107, 250, 0.65);
 }
 
-.portrait-frame::before {
-  content: "";
-  position: absolute;
-  inset: 2px;
-  border-radius: 50%;
-  background: var(--bg);
-  pointer-events: none;
-}
-
 .portrait-img {
   position: relative;
+  display: block;
   width: 100%;
   height: auto;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 4 / 5;
   object-fit: cover;
-  border-radius: 50%;
+  border-radius: calc(1.75rem - 3px);
   border: 0;
-}
-
-.portrait-caption {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 0.35rem 0.7rem;
-  padding: 0.9rem 0.25rem 0;
-  font-family: var(--font-mono);
-  font-size: 0.62rem;
-  line-height: 1.55;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  text-align: center;
-  color: var(--muted);
-}
-
-.portrait-caption span:first-child {
-  color: var(--secondary);
 }
 
 /* Stat strip */
@@ -2017,7 +2028,7 @@ html:not(.js) [data-reveal] {
     gap: 0;
   }
 
-  .btn-cv .btn-cv-label {
+  .btn-cv--header .btn-cv-label {
     display: none;
   }
 

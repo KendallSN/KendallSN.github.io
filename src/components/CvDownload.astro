@@ -11,17 +11,51 @@ interface Props {
 
 const { lang, variant = 'compact' } = Astro.props;
 const t = useTranslations(lang);
-const href = toUrl(site.cv[lang].replace(/^\/+/, ''));
+
+const hrefEs = toUrl(site.cv.es.replace(/^\/+/, ''));
+const hrefEn = toUrl(site.cv.en.replace(/^\/+/, ''));
+
+const options = [
+  { key: 'es', href: hrefEs, label: t('common.cvEs'), aria: t('common.cvEsLabel') },
+  { key: 'en', href: hrefEn, label: t('common.cvEn'), aria: t('common.cvEnLabel') },
+];
+
+const isFull = variant === 'full';
 const label = variant === 'header' ? t('common.cvShort') : t('common.downloadCv');
+const href = lang === 'es' ? hrefEs : hrefEn;
 ---
 
-<a
-  class:list={['btn', 'btn-cv', variant === 'full' ? '' : 'btn--sm']}
-  href={href}
-  download
-  aria-label={t('common.downloadCvLabel')}
-  title={`${t('common.downloadCv')} (PDF)`}
->
-  <i class="bi bi-filetype-pdf" aria-hidden="true"></i>
-  <span class="btn-cv-label">{label}</span>
-</a>
+{
+  isFull ? (
+    <div class="cv-group" role="group" aria-label={t('common.cvGroupLabel')} data-cv-group>
+      {options.map((option) => (
+        <a
+          class="btn btn-cv"
+          href={option.href}
+          download
+          aria-label={option.aria}
+          title={`${option.label} (PDF)`}
+          data-cv-lang={option.key}
+        >
+          <i class="bi bi-filetype-pdf" aria-hidden="true" />
+          <span class="btn-cv-label">{option.label}</span>
+        </a>
+      ))}
+    </div>
+  ) : (
+    <a
+      class:list={[
+        'btn',
+        'btn-cv',
+        variant === 'header' ? 'btn-cv--header' : 'btn--sm',
+      ]}
+      href={href}
+      download
+      aria-label={t('common.downloadCvLabel')}
+      title={`${t('common.downloadCv')} (PDF)`}
+    >
+      <i class="bi bi-filetype-pdf" aria-hidden="true" />
+      <span class="btn-cv-label">{label}</span>
+    </a>
+  )
+}
