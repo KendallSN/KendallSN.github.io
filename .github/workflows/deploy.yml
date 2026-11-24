@@ -20,6 +20,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Check Web3Forms key
+        run: |
+          if [ -z "$PUBLIC_WEB3FORMS_ACCESS_KEY" ]; then
+            echo "::error::PUBLIC_WEB3FORMS_ACCESS_KEY is empty. Set it in Settings > Secrets and variables > Actions > Variables (repository variable, not a secret)."
+            exit 1
+          fi
+          echo "Web3Forms key present (${#PUBLIC_WEB3FORMS_ACCESS_KEY} chars)"
+        env:
+          PUBLIC_WEB3FORMS_ACCESS_KEY: ${{ vars.PUBLIC_WEB3FORMS_ACCESS_KEY }}
 
       - name: Build with Astro
         uses: withastro/action@v3
